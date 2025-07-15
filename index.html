@@ -263,7 +263,7 @@
             }
         };
 
-        // Encoding map with AM/PM logic
+        // Fixed encoding map with corrected mappings
         const encodingMap = {
             'A': { am: 'Ö', pm: 'Ö' },
             'B': { am: 'ஐ', pm: 'ஐ' },
@@ -289,7 +289,7 @@
             'V': { am: 'E', pm: 'E' },
             'W': { am: '122', pm: '52' },
             'X': { am: 'F', pm: 'F' },
-            'Y': { am: 'E', pm: 'E' },
+            'Y': { am: 'Ψ', pm: 'Ψ' },  // Changed to ensure unique mapping
             'Z': { am: 'H', pm: 'H' },
             
             // Lowercase mappings
@@ -317,7 +317,7 @@
             'v': { am: 'E', pm: 'E' },
             'w': { am: '122', pm: '52' },
             'x': { am: 'F', pm: 'F' },
-            'y': { am: 'E', pm: 'E' },
+            'y': { am: 'Ψ', pm: 'Ψ' },  // Changed to ensure unique mapping
             'z': { am: 'H', pm: 'H' }
         };
 
@@ -327,17 +327,25 @@
             const amValue = encodingMap[key].am;
             const pmValue = encodingMap[key].pm;
             
-            decodingMap[amValue] = key;
-            decodingMap[pmValue] = key;
+            if (!decodingMap[amValue]) {
+                decodingMap[amValue] = key;
+            }
+            if (!decodingMap[pmValue]) {
+                decodingMap[pmValue] = key;
+            }
         }
 
         // Add all single-letter variants to decoding map
         for (const letter in singleLetterObfuscation) {
             singleLetterObfuscation[letter].am.forEach(variant => {
-                decodingMap[variant] = letter;
+                if (!decodingMap[variant]) {
+                    decodingMap[variant] = letter;
+                }
             });
             singleLetterObfuscation[letter].pm.forEach(variant => {
-                decodingMap[variant] = letter;
+                if (!decodingMap[variant]) {
+                    decodingMap[variant] = letter;
+                }
             });
         }
 
@@ -347,7 +355,7 @@
 
         function getRandomSingleLetterVariant(letter, isPM) {
             const variants = singleLetterObfuscation[letter]?.[isPM ? 'pm' : 'am'];
-            if (variants) {
+            if (variants && Math.random() > 0.3) { // 70% chance to use variant
                 return variants[Math.floor(Math.random() * variants.length)];
             }
             return null;
