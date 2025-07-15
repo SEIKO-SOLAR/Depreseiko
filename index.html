@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- [Previous head content remains exactly the same] -->
+    <style>
+        /* [All previous CSS remains exactly the same] */
+    </style>
+</head>
+<body>
+    <!-- [All previous HTML remains exactly the same until the script] -->
+    
+    <script>
+        // [Time display functions remain exactly the same]
+
+        // Encoding map with AM/PM logic
+        const encodingMap = {
+            'A': { am: 'Ö', pm: 'Ö' },
+            'B': { am: 'ஐ', pm: 'ஐ' },
+            'C': { am: '131', pm: '15' },
+            'D': { am: 'ש', pm: 'ש' },
+            'E': { am: 'M', pm: 'M' },
+            'F': { am: 'N', pm: 'N' },
+            'G': { am: '109', pm: '2' },
+            'H': { am: 'P', pm: 'P' },
+            'I': { am: 'Q', pm: 'Q' },
+            'J': { am: 'H', pm: 'H' },
+            'K': { am: '137', pm: '190' },
+            'L': { am: 'Γ', pm: 'Γ' },
+            'M': { am: '', pm: '' },
+            'N': { am: 'T', pm: 'T' },
+            'O': { am: '166', pm: '177' },
+            'P': { am: 'V', pm: 'V' },
+            'Q': { am: 'X', pm: 'X' },
+            'R': { am: 'Z', pm: 'Z' },
+            'S': { am: '94', pm: '164' },
+            'T': { am: 'B', pm: 'B' },
+            'U': { am: 'n', pm: 'n' },
+            'V': { am: 'E', pm: 'E' },
+            'W': { am: '122', pm: '52' },
+            'X': { am: 'F', pm: 'F' },
+            'Y': { am: 'E', pm: 'E' },
+            'Z': { am: 'H', pm: 'H' },
+            
+            // Lowercase mappings
+            'a': { am: 'Ö', pm: 'Ö' },
+            'b': { am: 'ஐ', pm: 'ஐ' },
+            'c': { am: '131', pm: '15' },
+            'd': { am: 'ש', pm: 'ש' },
+            'e': { am: 'M', pm: 'M' },
+            'f': { am: 'N', pm: 'N' },
+            'g': { am: '109', pm: '2' },
+            'h': { am: 'P', pm: 'P' },
+            'i': { am: 'Q', pm: 'Q' },
+            'j': { am: 'H', pm: 'H' },
+            'k': { am: '137', pm: '190' },
+            'l': { am: 'Γ', pm: 'Γ' },
+            'm': { am: '', pm: '' },
+            'n': { am: 'T', pm: 'T' },
+            'o': { am: '166', pm: '177' },
+            'p': { am: 'V', pm: 'V' },
+            'q': { am: 'X', pm: 'X' },
+            'r': { am: 'Z', pm: 'Z' },
+            's': { am: '94', pm: '164' },
+            't': { am: 'B', pm: 'B' },
+            'u': { am: 'n', pm: 'n' },
+            'v': { am: 'E', pm: 'E' },
+            'w': { am: '122', pm: '52' },
+            'x': { am: 'F', pm: 'F' },
+            'y': { am: 'E', pm: 'E' },
+            'z': { am: 'H', pm: 'H' }
+        };
+
+        // Create decoding map by reversing the encoding map
+        const decodingMap = {};
+        for (const key in encodingMap) {
+            const amValue = encodingMap[key].am;
+            const pmValue = encodingMap[key].pm;
+            
+            // Map both AM and PM values back to the original key
+            decodingMap[amValue] = key;
+            decodingMap[pmValue] = key;
+        }
+
+        function transformText(text, map, isEncoding) {
+            if (isEncoding) {
+                // Encoding logic remains the same
+                return text.split('').map(char => {
+                    const mapping = map[char.toUpperCase()] || map[char.toLowerCase()] || { am: char, pm: char };
+                    return isPM ? mapping.pm : mapping.am;
+                }).join('');
+            } else {
+                // New improved decoding logic
+                let result = '';
+                let i = 0;
+                while (i < text.length) {
+                    let found = false;
+                    
+                    // Check for multi-character codes first (3 digits)
+                    if (i + 2 < text.length) {
+                        const threeDigit = text.substr(i, 3);
+                        if (decodingMap[threeDigit]) {
+                            result += decodingMap[threeDigit];
+                            i += 3;
+                            found = true;
+                        }
+                    }
+                    
+                    // Check for 2-digit codes if 3-digit not found
+                    if (!found && i + 1 < text.length) {
+                        const twoDigit = text.substr(i, 2);
+                        if (decodingMap[twoDigit]) {
+                            result += decodingMap[twoDigit];
+                            i += 2;
+                            found = true;
+                        }
+                    }
+                    
+                    // Check single character if no multi-character code found
+                    if (!found) {
+                        const singleChar = text[i];
+                        result += decodingMap[singleChar] || singleChar;
+                        i++;
+                    }
+                }
+                return result.toLowerCase(); // Return in lowercase for consistency
+            }
+        }
+
+        // [Rest of the functions (encode, decode, showResult, etc.) remain exactly the same]
+    </script>
+</body>
+</html>
