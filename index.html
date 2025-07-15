@@ -263,7 +263,7 @@
             }
         };
 
-        // Fixed encoding map with corrected mappings
+        // Fixed encoding map with unique mappings for all letters
         const encodingMap = {
             'A': { am: 'Ö', pm: 'Ö' },
             'B': { am: 'ஐ', pm: 'ஐ' },
@@ -274,7 +274,7 @@
             'G': { am: '109', pm: '2' },
             'H': { am: 'P', pm: 'P' },
             'I': { am: 'Q', pm: 'Q' },
-            'J': { am: 'H', pm: 'H' },
+            'J': { am: 'Ĵ', pm: 'Ĵ' },  // Changed to unique mapping
             'K': { am: '137', pm: '190' },
             'L': { am: 'Γ', pm: 'Γ' },
             'M': { am: '', pm: '' },
@@ -289,8 +289,8 @@
             'V': { am: 'E', pm: 'E' },
             'W': { am: '122', pm: '52' },
             'X': { am: 'F', pm: 'F' },
-            'Y': { am: 'Ψ', pm: 'Ψ' },  // Changed to ensure unique mapping
-            'Z': { am: 'H', pm: 'H' },
+            'Y': { am: 'Ψ', pm: 'Ψ' },
+            'Z': { am: 'Ħ', pm: 'Ħ' },  // Changed to unique mapping
             
             // Lowercase mappings
             'a': { am: 'Ö', pm: 'Ö' },
@@ -302,7 +302,7 @@
             'g': { am: '109', pm: '2' },
             'h': { am: 'P', pm: 'P' },
             'i': { am: 'Q', pm: 'Q' },
-            'j': { am: 'H', pm: 'H' },
+            'j': { am: 'ĵ', pm: 'ĵ' },  // Changed to unique mapping
             'k': { am: '137', pm: '190' },
             'l': { am: 'Γ', pm: 'Γ' },
             'm': { am: '', pm: '' },
@@ -317,8 +317,8 @@
             'v': { am: 'E', pm: 'E' },
             'w': { am: '122', pm: '52' },
             'x': { am: 'F', pm: 'F' },
-            'y': { am: 'Ψ', pm: 'Ψ' },  // Changed to ensure unique mapping
-            'z': { am: 'H', pm: 'H' }
+            'y': { am: 'Ψ', pm: 'Ψ' },
+            'z': { am: 'ħ', pm: 'ħ' }   // Changed to unique mapping
         };
 
         // Create decoding map by reversing the encoding map
