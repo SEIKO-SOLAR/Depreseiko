@@ -240,29 +240,28 @@
     <div class="notification" id="notification">Copied to clipboard!</div>
     
     <script>
-        // Decoy characters that will be randomly inserted but ignored during decoding
-        const decoyChars = ['§', '±', '¥', '€', '¢', '¤', '¦', '¨', '©', '®', '°', 'µ', '¶', '·', '÷', '×', '¿', '•', '†', '‡'];
-        
-        // Get current time and AM/PM
-        function updateTimeDisplay() {
-            const now = new Date();
-            const options = { hour: 'numeric', minute: 'numeric', hour12: true };
-            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', options);
-            
-            const isPM = now.getHours() >= 12;
-            const amPmDisplay = document.getElementById('amPmDisplay');
-            amPmDisplay.textContent = isPM ? 'PM' : 'AM';
-            amPmDisplay.className = isPM ? 'am-pm pm' : 'am-pm am';
-            
-            return isPM;
-        }
-        
-        // Initial time display
-        let isPM = updateTimeDisplay();
-        // Update time every minute
-        setInterval(() => {
-            isPM = updateTimeDisplay();
-        }, 60000);
+        // Enhanced decoy characters with more variations
+        const decoyChars = ['§', '±', '¥', '€', '¢', '¤', '¦', '¨', '©', '®', '°', 'µ', '¶', '·', '÷', '×', '¿', '•', '†', '‡', 'Ω', '≈', '√', '∫', '~', '¬', 'ƒ', '∆', '◊', '♠', '♣', '♥', '♦'];
+
+        // Extended obfuscation for single letters with multiple representations
+        const singleLetterObfuscation = {
+            'A': { 
+                am: ['Å', 'Ã', 'Â', 'Α', '∀', 'Λ', '∆', 'Д', 'Ӑ', 'Ӓ'],
+                pm: ['Ä', 'À', 'Á', 'Æ', 'Ӕ', 'Ӗ', 'Ә', 'Ӛ', 'Ӝ', 'Ӟ']
+            },
+            'I': { 
+                am: ['Ì', 'Í', 'Î', 'Ï', 'Ǐ', 'І', 'Ӏ', 'Ӥ', 'Ӧ', 'Ө'],
+                pm: ['Ĩ', 'Ī', 'Į', 'İ', 'Ӗ', 'Ә', 'Ӛ', 'Ӝ', 'Ӟ', 'Ӡ']
+            },
+            'a': { 
+                am: ['å', 'ã', 'â', 'α', '∂', 'λ', 'δ', 'д', 'ӑ', 'ӓ'],
+                pm: ['ä', 'à', 'á', 'æ', 'ӕ', 'ӗ', 'ә', 'ӛ', 'ӝ', 'ӟ']
+            },
+            'i': { 
+                am: ['ì', 'í', 'î', 'ï', 'ǐ', 'і', 'ӏ', 'ӥ', 'ӧ', 'ө'],
+                pm: ['ĩ', 'ī', 'į', 'ı', 'ӗ', 'ә', 'ӛ', 'ӝ', 'ӟ', 'ӡ']
+            }
+        };
 
         // Encoding map with AM/PM logic
         const encodingMap = {
@@ -328,36 +327,90 @@
             const amValue = encodingMap[key].am;
             const pmValue = encodingMap[key].pm;
             
-            // Map both AM and PM values back to the original key
             decodingMap[amValue] = key;
             decodingMap[pmValue] = key;
+        }
+
+        // Add all single-letter variants to decoding map
+        for (const letter in singleLetterObfuscation) {
+            singleLetterObfuscation[letter].am.forEach(variant => {
+                decodingMap[variant] = letter;
+            });
+            singleLetterObfuscation[letter].pm.forEach(variant => {
+                decodingMap[variant] = letter;
+            });
         }
 
         function getRandomDecoy() {
             return decoyChars[Math.floor(Math.random() * decoyChars.length)];
         }
 
+        function getRandomSingleLetterVariant(letter, isPM) {
+            const variants = singleLetterObfuscation[letter]?.[isPM ? 'pm' : 'am'];
+            if (variants) {
+                return variants[Math.floor(Math.random() * variants.length)];
+            }
+            return null;
+        }
+
+        // Initialize time display
+        let isPM;
+        function updateTimeDisplay() {
+            const now = new Date();
+            const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', options);
+            
+            isPM = now.getHours() >= 12;
+            const amPmDisplay = document.getElementById('amPmDisplay');
+            amPmDisplay.textContent = isPM ? 'PM' : 'AM';
+            amPmDisplay.className = isPM ? 'am-pm pm' : 'am-pm am';
+        }
+
+        // Initial call and set interval
+        updateTimeDisplay();
+        setInterval(updateTimeDisplay, 60000);
+
         function transformText(text, map, isEncoding) {
             if (isEncoding) {
                 let result = '';
-                for (let char of text) {
-                    // Insert random decoy characters (40% chance before character)
-                    if (Math.random() < 0.4) {
-                        result += getRandomDecoy();
+                const words = text.split(/(\s+)/); // Split including whitespace
+                
+                for (let word of words) {
+                    if (word.trim().length === 0) {
+                        result += word; // Preserve whitespace
+                        continue;
                     }
                     
-                    // Get the encoded character
-                    const mapping = map[char.toUpperCase()] || map[char.toLowerCase()] || { am: char, pm: char };
-                    result += isPM ? mapping.pm : mapping.am;
-                    
-                    // Insert random decoy characters (30% chance after character)
-                    if (Math.random() < 0.3) {
-                        result += getRandomDecoy();
+                    // Special handling for single-letter words
+                    if (word.length === 1 && singleLetterObfuscation[word.toLowerCase()]) {
+                        const letter = word;
+                        const variant = getRandomSingleLetterVariant(letter, isPM) || 
+                                       getRandomSingleLetterVariant(letter.toLowerCase(), isPM)?.toUpperCase();
+                        
+                        if (variant) {
+                            // Add multiple decoys around single letters
+                            result += getRandomDecoy() + getRandomDecoy();
+                            result += variant;
+                            result += getRandomDecoy() + getRandomDecoy();
+                            continue;
+                        }
                     }
                     
-                    // Insert random decoy characters (20% chance between characters)
-                    if (Math.random() < 0.2) {
-                        result += getRandomDecoy();
+                    // Process multi-letter words normally
+                    for (let char of word) {
+                        // Insert random decoy characters (50% chance before character)
+                        if (Math.random() < 0.5) {
+                            result += getRandomDecoy();
+                        }
+                        
+                        // Get the encoded character
+                        const mapping = map[char.toUpperCase()] || map[char.toLowerCase()] || { am: char, pm: char };
+                        result += isPM ? mapping.pm : mapping.am;
+                        
+                        // Insert random decoy characters (40% chance after character)
+                        if (Math.random() < 0.4) {
+                            result += getRandomDecoy();
+                        }
                     }
                 }
                 return result;
@@ -405,36 +458,27 @@
         }
 
         function encode() {
-            const input = document.getElementById('inputText').value.trim();
-            if (!input) {
+            const input = document.getElementById('inputText').value;
+            if (!input.trim()) {
                 showNotification("Please enter some text first!");
                 return;
             }
             
             const result = transformText(input, encodingMap, true);
-            showResult(result);
+            document.getElementById('resultText').textContent = result;
+            document.getElementById('resultContainer').style.display = 'block';
         }
 
         function decode() {
-            const input = document.getElementById('inputText').value.trim();
-            if (!input) {
+            const input = document.getElementById('inputText').value;
+            if (!input.trim()) {
                 showNotification("Please enter some text first!");
                 return;
             }
             
             const result = transformText(input, decodingMap, false);
-            showResult(result);
-        }
-
-        function showResult(text) {
-            const resultContainer = document.getElementById('resultContainer');
-            const resultText = document.getElementById('resultText');
-            
-            resultText.textContent = text;
-            resultContainer.style.display = 'block';
-            
-            // Scroll to result if it's not fully visible
-            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('resultText').textContent = result;
+            document.getElementById('resultContainer').style.display = 'block';
         }
 
         function copyResult() {
@@ -459,6 +503,9 @@
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
+
+        // Initialize time display on load
+        window.addEventListener('DOMContentLoaded', updateTimeDisplay);
     </script>
 </body>
 </html>
